@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using MyShop.Core.Models;
+using MyShop.Core.ViewModels;
 using MyShop.DataAccess.InMemory;
 
 
@@ -14,11 +15,13 @@ namespace MyShop.WebUI.Controllers
         //dimiourgoume instance ths class
         ProductRepository context;
 
+        ProductCategoryRepository productCategories;
+
         //o constrcutor ths parousas class
         public ProductManagerController()
         {
             context = new ProductRepository();
-
+            productCategories = new ProductCategoryRepository();
 
         }
         // GET: ProductManager
@@ -33,11 +36,13 @@ namespace MyShop.WebUI.Controllers
 
         public ActionResult Create()
         {
-
+            ProductManagerViewModel viewModel = new ProductManagerViewModel();
             //Dhmiourgoume ena object tis klasis Product (Vasiko Model)
-            Product product = new Product();
+            viewModel.Product = new Product();
+            viewModel.ProductCategories = productCategories.Collection();
 
-            return View(product);
+
+            return View(viewModel);
         }
         [HttpPost]
         public ActionResult Create(Product product)
@@ -67,6 +72,9 @@ namespace MyShop.WebUI.Controllers
             }
             else
             {
+                ProductManagerViewModel viewModel = new ProductManagerViewModel();
+                viewModel.Product = product;
+                viewModel.ProductCategories = productCategories.Collection();
                 return View(product);
             
             }
