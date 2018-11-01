@@ -12,17 +12,13 @@ namespace MyShop.WebUI.Controllers
 {
     public class ProductManagerController : Controller
     {
-        //dimiourgoume instance ths class
-        ProductRepository context;
+        InMemoryRepository<Product> context;
+        InMemoryRepository<ProductCategory> productCategories;
 
-        ProductCategoryRepository productCategories;
-
-        //o constrcutor ths parousas class
         public ProductManagerController()
         {
-            context = new ProductRepository();
-            productCategories = new ProductCategoryRepository();
-
+            context = new InMemoryRepository<Product>();
+            productCategories = new InMemoryRepository<ProductCategory>();
         }
         // GET: ProductManager
         public ActionResult Index()
@@ -31,26 +27,21 @@ namespace MyShop.WebUI.Controllers
             return View(products);
         }
 
-        //Ftiaxnoume ta 2 Create Methods gia na dhmiourgoume Products.
-        //To prwto kanei tis aparaithtes energeies eno to allo kalei http post request
-
         public ActionResult Create()
         {
             ProductManagerViewModel viewModel = new ProductManagerViewModel();
-            //Dhmiourgoume ena object tis klasis Product (Vasiko Model)
+
             viewModel.Product = new Product();
             viewModel.ProductCategories = productCategories.Collection();
-
-
             return View(viewModel);
         }
+
         [HttpPost]
         public ActionResult Create(Product product)
         {
             if (!ModelState.IsValid)
             {
                 return View(product);
-
             }
             else
             {
@@ -58,8 +49,8 @@ namespace MyShop.WebUI.Controllers
                 context.Commit();
 
                 return RedirectToAction("Index");
-
             }
+
         }
 
         public ActionResult Edit(string Id)
@@ -68,30 +59,29 @@ namespace MyShop.WebUI.Controllers
             if (product == null)
             {
                 return HttpNotFound();
-
             }
             else
             {
                 ProductManagerViewModel viewModel = new ProductManagerViewModel();
                 viewModel.Product = product;
                 viewModel.ProductCategories = productCategories.Collection();
-                return View(product);
-            
-            }
 
+                return View(viewModel);
+            }
         }
+
         [HttpPost]
         public ActionResult Edit(Product product, string Id)
         {
             Product productToEdit = context.Find(Id);
+
             if (productToEdit == null)
             {
                 return HttpNotFound();
-
             }
             else
             {
-                if(!ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
                     return View(product);
                 }
@@ -102,55 +92,42 @@ namespace MyShop.WebUI.Controllers
                 productToEdit.Name = product.Name;
                 productToEdit.Price = product.Price;
 
-
                 context.Commit();
 
                 return RedirectToAction("Index");
             }
-
-            
         }
+
         public ActionResult Delete(string Id)
         {
             Product productToDelete = context.Find(Id);
+
             if (productToDelete == null)
             {
                 return HttpNotFound();
-
             }
             else
             {
                 return View(productToDelete);
-
             }
-
-
         }
+
         [HttpPost]
         [ActionName("Delete")]
         public ActionResult ConfirmDelete(string Id)
         {
             Product productToDelete = context.Find(Id);
+
             if (productToDelete == null)
             {
                 return HttpNotFound();
-
             }
             else
             {
                 context.Delete(Id);
                 context.Commit();
-
                 return RedirectToAction("Index");
-
             }
-
         }
-
-
-
-
-
-
     }
 }
